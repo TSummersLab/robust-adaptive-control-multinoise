@@ -1,4 +1,5 @@
 # robust-adaptive-control-multinoise
+## Robust adaptive control via multiplicative noise from bootstrapped uncertainty estimates
 The code in this repository implements the algorithms and ideas from our paper:
 
 "Robust Learning-Based Control via Bootstrapped Multiplicative Noise"
