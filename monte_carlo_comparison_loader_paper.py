@@ -10,9 +10,7 @@ from monte_carlo_comparison_loader import load_results, load_problem_data, get_l
 
 
 if __name__ == "__main__":
-
     experiment_folder = 'experiments'
-
     experiment = 'last'
 
     if experiment == 'last':

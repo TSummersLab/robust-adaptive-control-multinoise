@@ -164,7 +164,7 @@ def sample_transition_bootstrap(x_train_hist, u_train_hist, t=None, n=None, m=No
     SigmaA = mdot(Abar.T, Abar)/(Nb-1)
     SigmaB = mdot(Bbar.T, Bbar)/(Nb-1)
 
-    SigmaAeigvals, SigmaAeigvecs = la.eig(SigmaA)
+    SigmaAeigvals, SigmaAeigvecs = la.eigh(SigmaA)
     SigmaBeigvals, SigmaBeigvecs = la.eig(SigmaB)
     alpha = SigmaAeigvals
     beta = SigmaBeigvals
@@ -173,13 +173,12 @@ def sample_transition_bootstrap(x_train_hist, u_train_hist, t=None, n=None, m=No
     return alpha, Aa, beta, Bb, tag_str_list
 
 
-def semiparametric_bootstrap(Ahat, Bhat, x_train_hist, u_train_hist, w_hist, t=None, n=None, m=None, Nb=None,
+def semiparametric_bootstrap(Ahat, Bhat, x_train_hist, u_train_hist, t=None, n=None, m=None, Nb=None,
                              log_diagnostics=True):
     """
     Compute estimate of model uncertainty (covariance) via semiparametric bootstrap
     :param Ahat: Nominal A matrix
     :param Bhat: Nominal B matrix
-    :param w_hist: History of residuals i.e. additive process noise
     :param t: Time up to which to use the available data.
     :param Nb: Number of bootstrap samples
     """
@@ -202,6 +201,15 @@ def semiparametric_bootstrap(Ahat, Bhat, x_train_hist, u_train_hist, w_hist, t=N
 
     # Diagnostic logging
     tag_str_list = []
+
+    # Compute residuals under nominal model Ahat, Bhat
+    w_hist = np.zeros([t, n])
+    for i in range(t):
+        x = x_train_hist[i]
+        u = u_train_hist[i]
+        xp_true = x_train_hist[i+1]
+        xp_pred = np.dot(Ahat, x) + np.dot(Bhat, u)
+        w_hist[i] = xp_true - xp_pred
 
     # Initialize bootstrap training data
     for i in range(Nb):
@@ -235,15 +243,13 @@ def semiparametric_bootstrap(Ahat, Bhat, x_train_hist, u_train_hist, w_hist, t=N
     Bbar = Bhat_boot_reshaped - Bhat_boot_mean_reshaped
     SigmaA = mdot(Abar.T, Abar)/(Nb-1)
     SigmaB = mdot(Bbar.T, Bbar)/(Nb-1)
-    SigmaAeigvals, SigmaAeigvecs = la.eig(SigmaA)
-    SigmaBeigvals, SigmaBeigvecs = la.eig(SigmaB)
+    SigmaAeigvals, SigmaAeigvecs = la.eigh(SigmaA)
+    SigmaBeigvals, SigmaBeigvecs = la.eigh(SigmaB)
     alpha = SigmaAeigvals
     beta = SigmaBeigvals
-    Aa = np.reshape(SigmaAeigvecs, [n*n, n, n], order='F') # These uncertainty directions have unit Frobenius norm
-    Bb = np.reshape(SigmaBeigvecs, [n*m, n, m], order='F') # These uncertainty directions have unit Frobenius norm
+    Aa = np.reshape(SigmaAeigvecs, [n*n, n, n], order='F')  # These uncertainty directions have unit Frobenius norm
+    Bb = np.reshape(SigmaBeigvecs, [n*m, n, m], order='F')  # These uncertainty directions have unit Frobenius norm
     return alpha, Aa, beta, Bb, tag_str_list
-
-
 
 
 def compute_robust_gain(Ahat, Bhat, Q, R, a, Aa, b, Bb, noise_pre_scale, noise_post_scale,
@@ -512,12 +518,12 @@ def monte_carlo_sample(training_type, testing_type, control_scheme, uncertainty_
             if control_scheme == 'robust':
                 if uncertainty_estimator == 'sample_transition_bootstrap':
                     # Estimate model uncertainty via non-parametric bootstrap
-                    alpha, Aa, beta, Bb, tag_str_list_bp = sample_transition_bootstrap(x_train_hist, u_train_hist, t,
-                                                                                   Nb=Nb,
-                                                                                   log_diagnostics=log_diagnostics)
+                    alpha, Aa, beta, Bb, tag_str_list_bp = sample_transition_bootstrap(x_train_hist, u_train_hist,
+                                                                                       t, Nb=Nb,
+                                                                                       log_diagnostics=log_diagnostics)
                 elif uncertainty_estimator == 'semiparametric_bootstrap':
                     alpha, Aa, beta, Bb, tag_str_list_bp = semiparametric_bootstrap(Ahat, Bhat,
-                                                                                    x_train_hist, u_train_hist, w_hist,
+                                                                                    x_train_hist, u_train_hist,
                                                                                     t, Nb=Nb,
                                                                                     log_diagnostics=log_diagnostics)
                 elif uncertainty_estimator == 'exact':
@@ -861,7 +867,7 @@ def mainfun(training_type, testing_type, uncertainty_estimator, Ns, Nb, T, noise
     pickle_export(dirname_out, filename_out, data_out)
 
     # Plotting
-    show_plots = False
+    show_plots = True
     if show_plots:
         from plotting import multi_plot
         multi_plot(output_dict, cost_are_true, t_hist, t_start_estimate)
@@ -883,12 +889,13 @@ if __name__ == "__main__":
 
     # Number of Monte Carlo samples
     Ns = 100000
+    # Ns = 100
 
     # Number of bootstrap samples
     Nb = 100
 
     # Simulation time
-    T = 100
+    T = 200
 
     # Choose noise_pre_scale (AKA gamma), the pre-limit multiplicative noise scaling parameter, should be >= 1
     # "How much mult noise do you want?"
@@ -913,7 +920,8 @@ if __name__ == "__main__":
     t_cost_fh = 10
 
     # Random number generator seed
-    seed = npr.randint(1000)
+    seed = 1
+    # seed = npr.randint(1000)
 
     # System to choose
     system_idx = 'scalar'

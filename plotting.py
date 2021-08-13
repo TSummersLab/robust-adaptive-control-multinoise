@@ -25,10 +25,10 @@ def comparison_plot(output_dict, cost_are_true, t_hist, t_start_estimate, plot_f
                     show_samples=True,
                     sample_idx_list=None, sample_legend=False,
                     trim_mean_quantile=None, quantiles=None, quantile_fill_alpha=0.2, quantile_color='tab:blue',
-                    quantile_region='middle', quantile_style='fill', quantile_legend=True,
+                    quantile_region='middle', quantile_style='fill', quantile_legend=False,
                     comparative=True, stat_diff_type='diff_of_stat',
                     grid=True, show_guideline=True, zoom=False, match_ylims=True,
-                    maximize_window=False, figsize = (8, 6)):
+                    maximize_window=False, figsize=(12, 10)):
     """
     Plot comparison of results using two different control schemes.
     :param output_dict: Dictionary of data history dictionaries associated with each control scheme
@@ -370,7 +370,7 @@ def comparison_plot(output_dict, cost_are_true, t_hist, t_start_estimate, plot_f
     return fig, ax
 
 
-def multi_plot(output_dict, cost_are_true, t_hist, t_start_estimate):
+def multi_plot(output_dict, cost_are_true, t_hist, t_start_estimate, legend=True):
     plt.close('all')
     # plot_fields_all = [['regret_hist',
     #                     'cost_adaptive_hist',
@@ -454,7 +454,6 @@ def multi_plot(output_dict, cost_are_true, t_hist, t_start_estimate):
         figs.append(fig)
     plt.show()
     return figs
-
 
 
 def multi_plot_paper(output_dict, cost_are_true, t_hist, t_start_estimate,

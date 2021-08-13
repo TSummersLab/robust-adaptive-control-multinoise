@@ -64,9 +64,7 @@ def get_last_dir(parent_folder):
 
 
 if __name__ == "__main__":
-
     experiment_folder = 'experiments'
-
     experiment = 'last'
 
     if experiment == 'last':
@@ -91,7 +89,6 @@ if __name__ == "__main__":
             print(log_str)
     except:
         pass
-
 
     # Check for bad data
     for i in range(Ns):
