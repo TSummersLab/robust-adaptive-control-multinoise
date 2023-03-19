@@ -312,7 +312,7 @@ def monte_carlo_sample(training_type, testing_type, control_scheme, uncertainty_
     n = required_args['n']
     m = required_args['m']
     A = required_args['A']
-    B  = required_args['B']
+    B = required_args['B']
     Q = required_args['Q']
     R = required_args['R']
     Ns = required_args['Ns']

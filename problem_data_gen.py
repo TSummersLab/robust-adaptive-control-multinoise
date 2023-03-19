@@ -51,32 +51,32 @@ def gen_rand_system(n=3, m=2, spectral_radius=0.9, noise_scale=1, noise_shape='e
 
 
 def gen_scalar_system(A=1, B=1, Q=1, R=1, W=1):
-        # Scalar system
-        n = 1
-        m = 1
-        # Ensure arrays are two-dimensional in case A, B, Q, R, W are scalars
-        A, B, Q, R, W = [var*np.eye(1) for var in [A, B, Q, R, W]]
-        return n, m, A, B, Q, R, W
+    # Scalar system
+    n = 1
+    m = 1
+    # Ensure arrays are two-dimensional in case A, B, Q, R, W are scalars
+    A, B, Q, R, W = [var*np.eye(1) for var in [A, B, Q, R, W]]
+    return n, m, A, B, Q, R, W
 
 
 def gen_pendulum_system(inverted, mass=10, damp=2, dt=0.1, Q=None, R=None, W=None):
-        # Pendulum with forward Euler discretization
-        n = 2
-        m = 1
-        if inverted:
-            sign = 1
-        else:
-            sign = -1
-        A = np.array([[1, dt], [sign*mass*dt, 1-damp*dt]])
-        B = np.array([[0], [dt]])
-        if Q is None:
-            Q = np.eye(n)
-        if R is None:
-            R = np.eye(m)
-        if W is None:
-            W = 0.001*np.diag([0.01, 1])
+    # Pendulum with forward Euler discretization
+    n = 2
+    m = 1
+    if inverted:
+        sign = 1
+    else:
+        sign = -1
+    A = np.array([[1, dt], [sign*mass*dt, 1-damp*dt]])
+    B = np.array([[0], [dt]])
+    if Q is None:
+        Q = np.eye(n)
+    if R is None:
+        R = np.eye(m)
+    if W is None:
+        W = 0.001*np.diag([0.01, 1])
 
-        return n, m, A, B, Q, R, W
+    return n, m, A, B, Q, R, W
 
 
 def gen_example_system(idx):
